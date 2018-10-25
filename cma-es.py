@@ -127,20 +127,27 @@ def main():
         f_value=np.matrix(f_value)
         offsprings=offsprings[np.array((-f_value[0,:]).argsort())[0],:]
         f_value=np.array(f_value)
+        print('f_value_tree',f_value_tree)
+        print('offspring_tree',offspring_tree)
         y=(offsprings-mean)/sigma
         y_positivesum=sum(np.array(list(map(lambda a,b:a*b,w[:mu],y[:mu]))))
+        #mean adaption
         mean_ng=mean+c_m*sigma*y_positivesum
+        print('mean_path',mean_path)
         g[0]=g[0]+1
         #step-size control
         p_sigma=(1-c_sigma)*p_sigma+(c_sigma*(2-c_sigma)*mu_eff)**(0.5)*C_halfinverse@y_positivesum
+        print('p_sigma_path',p_sigma_path)
         E_N=(n**(0.5)*(1-1/(4*n)-1/(21*n**2)))
         sigma=sigma*math.exp(c_sigma/d_sigma*(LA.norm(p_sigma)/E_N-1))
+        print('sigma_adaptation',sigma_adaptation)
         #Covariance-matrix adaptation
         if LA.norm(p_sigma)/(1-(1-c_sigma)**2)<(1.4+2/(n+1))*E_N:
             h_sigma=1
         else:
             h_sigma=0
         p_cumulation=(1-c_c)*p_cumulation+h_sigma*(c_c*(2-c_c)*mu_eff)**(0.5)*y_positivesum
+        print('p_cumulation_path',p_cumulation_path)
         w_0=w.copy()
         for e,y0 in zip(w_0,y):
             if e >=0:
@@ -151,7 +158,8 @@ def main():
         pcpc_t=np.matrix(p_cumulation).T@np.matrix(p_cumulation)
         weighted_yy_t=sum(np.array(list(map(lambda e,w0:np.matrix(e).T@np.matrix(e),y,w_0))))
         C_ng=(1+c_1*delta_h_sigma-c_1-c_mu*(w.sum()))*C+c_1*pcpc_t+c_mu*weighted_yy_t
-        #main evolution of model
+        print('C_path',C_path)
+        #main evolution(i.e. distribution) of model
         C=C_ng
         mean=mean_ng
         #recording
@@ -236,8 +244,8 @@ def im2gif(path,filenames):
 if __name__=='__main__':
     path=r'C:\Users\gx\projects\results'
     main()
-    l=os.listdir(path)
-    im2gif(path,l)
+#    l=os.listdir(path)
+#    im2gif(path,l)
 
 
 
